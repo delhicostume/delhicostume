@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Login Modal with Firebase</title>
+  <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
+
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQ-1W9YUO7zmxxv8-X1joOOv2QXeUSao4",
+    authDomain: "delhicostume.firebaseapp.com",
+    projectId: "delhicostume",
+    storageBucket: "delhicostume.appspot.com",
+    messagingSenderId: "698943204847",
+    appId: "1:698943204847:web:0b0a6bd31289a30acd5a1a",
+    measurementId: "G-1YGX1RNTQH"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <style>
+    .account-icon {
+      cursor: pointer;
+      font-size: 20px;
+      color: #333;
+      margin-left: 15px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .account-icon i {
+      padding: 10px;
+      background: #eee;
+      border-radius: 50%;
+    }
+
+    .login-modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .login-modal-content {
+      background: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      width: 300px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      cursor: pointer;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    #recaptcha-container {
+      margin-top: 10px;
+    }
+
+    .continue-btn {
+      background-color: #ff2d7a;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .continue-btn:hover {
+      background-color: #e60073;
+    }
+
+    .terms-text {
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">My Costume Store</div>
+    <ul class="menu">
+      <li><a href="index.html">Home</a></li>
+      <li class="dropdown">
+        <a href="#">Costumes</a>
+        <div class="submenu mega-menu">
+          <!-- Your existing costume menus -->
+          <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px;">ANIMAL & WILDLIFE</a></li>
+            <li><a href="animal-costumes.html">Animal</a></li>
+            <li><a href="#">Insect</a></li>
+            <li><a href="#">Flower</a></li>
+            <li><a href="#">Fruits</a></li>
+          </ul>
+          <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px">LEADERS & FREEDOM FIGHTERS</a></li>
+            <li><a href="freedom-fighters.html">Freedom Fighters</a></li>
+            <li><a href="#">National Leaders</a></li>
+            <li><a href="#">Historical Personalities</a></li>
+            <li><a href="#">Independence Day</a></li>
+            <li><a href="#">Republic Day</a></li>
+            <li><a href="#">Patriotic/Tricolor</a></li>
+          </ul>
+          <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px">FAIRY TALES & HALLOWEEN</a></li>
+            <li><a href="#">Fairy Tales</a></li>
+            <li><a href="#">Halloween</a></li>
+            <li><a href="#">World Costumes</a></li>
+            <li><a href="#">Christmas</a></li>
+          </ul>
+          <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px">MYTHOLOGY & COSTUME</a></li>
+            <li><a href="#">Ganesh Chaturthi</a></li>
+            <li><a href="#">Gods & Goddesses</a></li>
+            <li><a href="#">Janmashtami</a></li>
+            <li><a href="#">Ramleela</a></li>
+           </ul>
+           <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px">DANCES THEMES</a></li>
+            <li><a href="#">Classical</a></li>
+            <li><a href="#">Indian States & Folk</a></li>
+            <li><a href="#">Indo-Western Dance</a></li>
+            <li><a href="#">International Dance</a></li>
+            <li><a href="#">Western Dance</a></li>
+           </ul>
+           <ul>
+            <li><a href="#" class="menu-heading" style="font-weight: bold; color: Red;font-size: 16px">HELPERS & PROFESSIONALS</a></li>
+            <li><a href="#">Helpers</a></li>
+            <li><a href="#">Professionals</a></li>
+           </ul>
+        </div>
+      </li>
+      <li><a href="#">Accessories</a></li>
+      <li><a href="#">Cart</a></li>
+    </ul>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for costumes..." />
+      <button>Search</button>
+      <div class="account-icon" onclick="openLoginPopup()">
+        <i class="fa fa-user"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Find Your Perfect Costume!</h1>
+    <p>Explore our wide range of costumes for every occasion.</p>
+    <button>Shop Now</button>
+  </section>
+
+  <!-- Filters -->
+  <div class="filters">
+    <label for="category-filter">Filter by Category:</label>
+    <select id="category-filter">
+      <option value="all">All</option>
+      <option value="superhero">Superhero</option>
+      <option value="pirate">Pirate</option>
+      <option value="fairy">Fairy</option>
+    </select>
+  </div>
+
+  <!-- Products Section -->
+  <section class="products">
+    <h2>Featured Costumes</h2>
+    <div class="product-grid">
+      <div class="product" data-category="superhero">
+        <img src="costume1.jpg" alt="Superhero Costume" />
+        <h3>Superhero Costume</h3>
+        <p>$49.99</p>
+        <label for="quantity">Quantity:</label>
+        <input type="number" class="quantity-input" value="1" min="1" />
+        <button class="add-to-cart">Add to Cart</button>
+      </div>
+      <div class="product" data-category="pirate">
+        <img src="costume2.jpg" alt="Pirate Costume" />
+        <h3>Pirate Costume</h3>
+        <p>$39.99</p>
+        <label for="quantity">Quantity:</label>
+        <input type="number" class="quantity-input" value="1" min="1" />
+        <button class="add-to-cart">Add to Cart</button>
+      </div>
+      <div class="product" data-category="fairy">
+        <img src="costume3.jpg" alt="Fairy Costume" />
+        <h3>Fairy Costume</h3>
+        <p>$59.99</p>
+        <label for="quantity">Quantity:</label>
+        <input type="number" class="quantity-input" value="1" min="1" />
+        <button class="add-to-cart">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shopping Cart -->
+  <section class="cart">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <p>Total: $<span id="cart-total">0.00</span></p>
+    <button onclick="clearCart()">Clear Cart</button>
+    <a href="checkout.html"><button>Proceed to Checkout</button></a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">About Us</a>
+      <a href="#">Contact</a>
+      <a href="#">FAQs</a>
+    </div>
+    <div class="social-media">
+      <a href="#">Facebook</a>
+      <a href="#">Instagram</a>
+      <a href="#">Twitter</a>
+    </div>
+    <p>&copy; 2025 My Costume Store. All rights reserved.</p>
+  </footer>
+
+  <!-- Login Modal -->
+<div id="loginModal" class="login-modal" style="display: none;">
+  <div class="login-modal-content">
+    <span class="close-btn" onclick="closeLoginPopup()">&times;</span>
+    <h2>Login or Signup</h2>
+
+    <div class="input-group">
+      <span>+91</span>
+      <input type="tel" id="mobileNumber" placeholder="Mobile Number" maxlength="10" required />
+    </div>
+
+    <div id="recaptcha-container" style="margin-top: 10px;"></div>
+
+    <p class="terms-text">
+      By continuing, I agree to the
+      <a href="#">Terms of Use</a> & <a href="#">Privacy Policy</a>
+    </p>
+
+    <button class="continue-btn" onclick="sendOTP()">CONTINUE</button>
+  </div>
+</div>
+
+<script>
+  let confirmationResult;
+
+  function openLoginPopup() {
+    document.getElementById("loginModal").style.display = "block";
+    setupRecaptcha();
+  }
+
+  function closeLoginPopup() {
+    document.getElementById("loginModal").style.display = "none";
+  }
+
+  window.onclick = function (event) {
+    const modal = document.getElementById("loginModal");
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  function setupRecaptcha() {
+    // Clear previous reCAPTCHA container
+    document.getElementById("recaptcha-container").innerHTML = "";
+
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'normal',
+      callback: (response) => {
+        console.log("reCAPTCHA verified");
+      },
+      'expired-callback': () => {
+        console.warn("reCAPTCHA expired, solve again");
+      }
+    });
+
+    recaptchaVerifier.render().then(widgetId => {
+      window.recaptchaWidgetId = widgetId;
+    });
+  }
+
+  function sendOTP() {
+    const mobile = document.getElementById("mobileNumber").value.trim();
+
+    if (!/^[0-9]{10}$/.test(mobile)) {
+      alert("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const phoneNumber = "+91" + mobile;
+    const appVerifier = window.recaptchaVerifier;
+
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+      .then(result => {
+        confirmationResult = result;
+        const otp = prompt("Enter the OTP sent to your mobile:");
+
+        if (!otp || otp.length !== 6) {
+          alert("Please enter a valid 6-digit OTP.");
+          return;
+        }
+
+        confirmationResult.confirm(otp)
+          .then(res => {
+            alert("Login successful! Welcome " + res.user.phoneNumber);
+            closeLoginPopup();
+          })
+          .catch(error => {
+            alert("OTP verification failed: " + error.message);
+          });
+      })
+      .catch(error => {
+        alert("Error sending OTP: " + error.message);
+      });
+  }
+</script>
